@@ -5,7 +5,6 @@ import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
 import { store } from './server/store.js';
 import {
   testCloudinaryConnection,
@@ -413,6 +412,7 @@ async function startServer() {
 
   // Vite Middleware integration for SPA dev & static file serving
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
