@@ -4,7 +4,6 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { store } from './server/store.js';
 import {
   testCloudinaryConnection,
@@ -14,9 +13,6 @@ import {
 } from './server/cloudinary.js';
 import { generateSitemapXml, generateRobotsTxt } from './server/seo.js';
 import { ImageItem, BlogPost, DMCAData, ContactData } from './src/types/index.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
