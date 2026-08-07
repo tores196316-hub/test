@@ -13,7 +13,7 @@ export const AuthPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { loginGoogle, demoAdminLogin } = useAuth();
+  const { loginGoogle, loginWithEmail } = useAuth();
   const { showToast } = useToast();
 
   const handleGoogleAuth = async () => {
@@ -27,12 +27,6 @@ export const AuthPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoAdmin = () => {
-    demoAdminLogin();
-    showToast('Sistem Yöneticisi olarak giriş yapıldı!', 'success');
-    navigate('/admin');
   };
 
   return (
@@ -87,8 +81,14 @@ export const AuthPage: React.FC = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            showToast('E-posta girişi yapıldı', 'success');
-            navigate('/profil');
+            loginWithEmail(email);
+            showToast(
+              email.trim().toLowerCase() === 'tores196316@gmail.com'
+                ? 'Yönetici olarak giriş yapıldı'
+                : 'E-posta ile giriş yapıldı',
+              'success'
+            );
+            navigate(email.trim().toLowerCase() === 'tores196316@gmail.com' ? '/admin' : '/profil');
           }}
           className="space-y-4"
         >
@@ -124,16 +124,6 @@ export const AuthPage: React.FC = () => {
             {isRegisterPage ? 'Kayıt Ol' : 'Giriş Yap'}
           </button>
         </form>
-
-        {/* Demo Admin Quick Login */}
-        <div className="pt-4 border-t border-slate-100 text-center">
-          <button
-            onClick={handleDemoAdmin}
-            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline"
-          >
-            ⚡ Admin Demosu ile Hızlı Giriş Yap
-          </button>
-        </div>
       </div>
     </div>
   );

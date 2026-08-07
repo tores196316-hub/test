@@ -9,8 +9,8 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   loginGoogle: () => Promise<void>;
+  loginWithEmail: (email: string) => void;
   logout: () => Promise<void>;
-  demoAdminLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       if (user) {
-        const isAdminUser = user.email === 'tores196316@gmail.com';
+        const isAdminUser = user.email?.toLowerCase() === 'tores196316@gmail.com';
         setIsAdmin(isAdminUser);
         setUserProfile({
           uid: user.uid,
@@ -34,10 +34,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           photoURL: user.photoURL || undefined,
           role: isAdminUser ? 'admin' : 'user',
           apiKey: 'pv_live_' + Math.random().toString(36).substring(2, 18),
-          totalUploads: 5,
-          totalViews: 120,
-          totalDownloads: 34,
-          totalStorageBytes: 15400000,
+          totalUploads: isAdminUser ? 24 : 5,
+          totalViews: isAdminUser ? 840 : 120,
+          totalDownloads: isAdminUser ? 190 : 34,
+          totalStorageBytes: isAdminUser ? 42000000 : 15400000,
           createdAt: new Date().toISOString(),
         });
       } else {
@@ -54,26 +54,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await loginWithGoogle();
   };
 
+  const loginWithEmail = (emailInput: string) => {
+    const isTargetAdmin = emailInput.trim().toLowerCase() === 'tores196316@gmail.com';
+    setIsAdmin(isTargetAdmin);
+    setUserProfile({
+      uid: 'user-' + Math.random().toString(36).substring(2, 9),
+      email: emailInput,
+      displayName: emailInput.split('@')[0] || 'Kullanıcı',
+      role: isTargetAdmin ? 'admin' : 'user',
+      apiKey: 'pv_live_' + Math.random().toString(36).substring(2, 18),
+      totalUploads: isTargetAdmin ? 24 : 5,
+      totalViews: isTargetAdmin ? 840 : 120,
+      totalDownloads: isTargetAdmin ? 190 : 34,
+      totalStorageBytes: isTargetAdmin ? 42000000 : 15400000,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
   const logout = async () => {
     await logoutUser();
     setUserProfile(null);
     setIsAdmin(false);
-  };
-
-  const demoAdminLogin = () => {
-    setIsAdmin(true);
-    setUserProfile({
-      uid: 'demo-admin-uid',
-      email: 'tores196316@gmail.com',
-      displayName: 'Sistem Yöneticisi',
-      role: 'admin',
-      apiKey: 'pv_live_admin_992039128390',
-      totalUploads: 24,
-      totalViews: 840,
-      totalDownloads: 190,
-      totalStorageBytes: 42000000,
-      createdAt: new Date().toISOString(),
-    });
   };
 
   return (
@@ -84,8 +85,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         loading,
         isAdmin,
         loginGoogle,
+        loginWithEmail,
         logout,
-        demoAdminLogin,
       }}
     >
       {children}
